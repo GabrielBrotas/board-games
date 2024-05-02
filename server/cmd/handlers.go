@@ -15,8 +15,7 @@ var (
 			return true // Consider validating against a list of approved origins
 		},
 	}
-	gameManager = NewGameManager()
-	words       = []string{"uva", "banana", "abacate", "abobora", "acerola"}
+	gameManager = NewGameManager(NewPlayerManager())
 )
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {
@@ -55,10 +54,29 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 				Two:   int(msg["two"].(float64)),
 				Three: int(msg["three"].(float64)),
 			}
-			gameManager.StartGame(dist)
+			category, _ := msg["category"].(string)
+			difficulty, _ := msg["difficulty"].(string)
+			gameManager.StartGame(dist, category, difficulty)
 		case "resetGame":
 			gameManager.ResetGame()
+		case "removePlayer":
+			playerID, ok := msg["playerID"].(string)
+			if ok {
+				gameManager.RemovePlayerByID(playerID)
+				gameManager.BroadcastPlayerList()
+			}
+		case "decideWinner":
+			impostorWon, ok := msg["impostorWon"].(bool)
+			if ok {
+				gameManager.UpdatePoints(impostorWon)
+				gameManager.BroadcastPlayerList()
+				gameManager.ResetGame()
+			}
+		case "resetPoints":
+			gameManager.ResetPoints()
+			gameManager.BroadcastPlayerList()
 		}
+
 	}
 
 	gameManager.RemovePlayer(player)

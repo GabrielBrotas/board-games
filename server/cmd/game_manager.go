@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"math/rand"
+	"sort"
 
 	"github.com/gorilla/websocket"
 )
@@ -14,12 +15,14 @@ type ImposterDistribution struct {
 }
 
 type GameManager struct {
-	players map[string]*Player
+	players       map[string]*Player
+	playerManager *PlayerManager
 }
 
-func NewGameManager() *GameManager {
+func NewGameManager(pm *PlayerManager) *GameManager {
 	return &GameManager{
-		players: make(map[string]*Player),
+		players:       make(map[string]*Player),
+		playerManager: pm,
 	}
 }
 
@@ -29,6 +32,27 @@ func (gm *GameManager) AddPlayer(player *Player) {
 
 func (gm *GameManager) RemovePlayer(player *Player) {
 	delete(gm.players, player.ID)
+}
+
+func (gm *GameManager) RemovePlayerByID(id string) {
+	player := gm.players[id]
+	if player == nil {
+		return
+	}
+
+	if player.Conn != nil {
+		err := player.Conn.WriteJSON(map[string]interface{}{
+			"type": "removedPlayer",
+		})
+
+		if err != nil {
+			log.Printf("Error sending removed player: %v", err)
+		}
+	}
+
+	delete(gm.players, id)
+
+	gm.BroadcastPlayerList()
 }
 
 func (gm *GameManager) SendPlayerList(conn *websocket.Conn) {
@@ -67,22 +91,43 @@ func (gm *GameManager) ResetGame() {
 	}
 }
 
-func (gm *GameManager) GetPlayerList() []string {
-	var playerList []string
+// func (gm *GameManager) GetPlayerList() []*PlayerOutput {
+// 	var playerList []*PlayerOutput
+// 	for _, player := range gm.players {
+// 		playerList = append(playerList, player.GetOutput(gm.playerManager))
+// 	}
+// 	return playerList
+// }
+
+func (gm *GameManager) GetPlayerList() []*PlayerOutput {
+	var playerList []*PlayerOutput
 	for _, player := range gm.players {
-		playerList = append(playerList, player.Name)
+		playerList = append(playerList, player.GetOutput(gm.playerManager))
 	}
+
+	// Sort the player list by points.
+	sort.Slice(playerList, func(i, j int) bool {
+		return playerList[i].Points > playerList[j].Points
+	})
+
 	return playerList
 }
 
 func (gm *GameManager) ChangePlayerName(player *Player, newName string) {
 	if _, exists := gm.players[player.ID]; exists {
 		gm.players[player.ID].Name = newName
+		gm.playerManager.AddUser(newName)
 	}
 }
 
-func (gm *GameManager) StartGame(dist ImposterDistribution) {
-	word := words[rand.Intn(len(words))]
+func (gm *GameManager) StartGame(dist ImposterDistribution, category string, difficulty string) {
+	word, err := generateWordFromOpenAI(category, difficulty)
+
+	if err != nil {
+		log.Printf("Error fetching word from OpenAI: %v", err)
+		return
+	}
+
 	numImposters := chooseImposters(dist)
 
 	// Create a slice of player IDs to properly select random players.
@@ -119,6 +164,35 @@ func (gm *GameManager) StartGame(dist ImposterDistribution) {
 		if err != nil {
 			log.Printf("Error sending role: %v", err)
 		}
+	}
+}
+
+func (gm *GameManager) UpdatePoints(impostorsWin bool) {
+	for _, player := range gm.players {
+		points := gm.playerManager.GetUserPoints(player.Name)
+		log.Printf("Player %s has %d points", player.Name, points)
+		if player.IsImpostor { // impostor
+			if impostorsWin {
+				points += 20
+			} else {
+				points += 5
+			}
+		} else { // crewmate
+			if impostorsWin {
+				points += 5
+			} else {
+				points += 10
+			}
+		}
+		log.Printf("Player %s now has %d points", player.Name, points)
+		gm.playerManager.UpdatePoints(player.Name, points)
+	}
+}
+
+func (gm *GameManager) ResetPoints() {
+	gm.playerManager.ResetPoints()
+	for _, player := range gm.players {
+		player.Points = 0
 	}
 }
 

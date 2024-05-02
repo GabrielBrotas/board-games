@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
-	"github.com/google/uuid"
-	"math/rand"
 	"fmt"
+	"math/rand"
+
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
 
 type Player struct {
@@ -12,6 +13,8 @@ type Player struct {
 	Name       string
 	Conn       *websocket.Conn
 	IsImpostor bool
+	Points     int
+	IsDeleted  bool
 }
 
 func NewPlayer(conn *websocket.Conn) *Player {
@@ -20,6 +23,8 @@ func NewPlayer(conn *websocket.Conn) *Player {
 		Name:       generatePlayerName(),
 		Conn:       conn,
 		IsImpostor: false,
+		Points:     0,
+		IsDeleted:  false,
 	}
 }
 
@@ -29,4 +34,19 @@ func generatePlayerID() string {
 
 func generatePlayerName() string {
 	return "Player-" + fmt.Sprint(rand.Intn(100))
+}
+
+type PlayerOutput struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Points int    `json:"points"`
+}
+
+func (p *Player) GetOutput(playerManager *PlayerManager) *PlayerOutput {
+	points := playerManager.GetUserPoints(p.Name)
+	return &PlayerOutput{
+		ID:     p.ID,
+		Name:   p.Name,
+		Points: points,
+	}
 }
