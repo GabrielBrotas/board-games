@@ -35,7 +35,7 @@ export function WhoIsTheImposter() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const newWs = new WebSocket("ws://localhost:8081/ws");
+    const newWs = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws`);
     setWs(newWs);
 
     newWs.onopen = () => handleWebSocketOpen(newWs);
