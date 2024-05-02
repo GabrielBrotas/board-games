@@ -22,13 +22,12 @@ export const GameHome = ({
           <li key={player.name} className="bg-gray-700 p-2 rounded-md mb-2">
             <div className="flex justify-between items-center">
               <p>{player.name}</p>
-              <div className="flex justify-between items-center gap-4">
+              <div className="flex items-center gap-4">
                 <span>{player.points}</span>
                 {isAdmin && (
                   <button
-                    className="text-red-500"
-                    title="Remover jogador"
                     onClick={() => removePlayer(player.id)}
+                    className="text-red-500 hover:text-red-700"
                   >
                     <MdDelete color="#ff0000" size={20} />
                   </button>
@@ -38,11 +37,10 @@ export const GameHome = ({
           </li>
         ))}
       </ul>
-
       {isAdmin ? (
         <button
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           onClick={startGame}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
         >
           Start Game
         </button>

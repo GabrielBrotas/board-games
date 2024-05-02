@@ -24,9 +24,10 @@ export const GameSetup = ({
   resetPoints,
 }: GameSetupProps) => {
   return (
-    <div className="bg-gray-900 text-white p-8 rounded-lg shadow-lg w-full">
-      <h1 className="text-xl font-bold mb-6 text-center">Setup Game</h1>
-      <div className="flex justify-between items-center mb-4 flex-wrap">
+    <div className="bg-gray-900 text-white p-4 rounded-lg shadow-lg max-w-lg w-full">
+      <h1 className="text-xl font-bold mb-6 text-center">Game Setup</h1>
+
+      <div className="flex justify-between items-center mb-4">
         <label htmlFor="one-imposter" className="flex-1 text-sm font-semibold">
           1 Imposter:
         </label>

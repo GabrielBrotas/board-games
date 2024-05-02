@@ -65,7 +65,7 @@ export function WhoIsTheImposter() {
 
   const handleWebSocketMessage = (event: MessageEvent<any>) => {
     const data = JSON.parse(event.data);
-    console.log(`Received message: ${data.type}`);
+
     switch (data.type) {
       case "playerList":
         setPlayers(data.players);
@@ -135,40 +135,45 @@ export function WhoIsTheImposter() {
   };
 
   return (
-    <div className="bg-gray-800 min-h-screen flex flex-col items-center justify-center gap-4">
-      <Link href="/">
-        <b className="absolute top-0 left-0 m-4 bg-gray-500 text-white px-4 py-2 rounded">
-          Voltar
-        </b>
-      </Link>
-      <div className="flex flex-col gap-4 w-full max-w-sm px-4">
-        {gameStarted ? (
-          <GameStarted
-            message={message}
-            isAdmin={isAdmin}
-            resetGame={resetGame}
-            decideWinner={handleRoundWinner}
-          />
-        ) : (
-          <GameHome
-            players={players}
-            startGame={startGame}
-            isAdmin={isAdmin}
-            removePlayer={removePlayer}
-          />
-        )}
-        {isAdmin && !gameStarted && (
-          <GameSetup
-            imposterChances={imposterChances}
-            handleImposterChange={handleImposterChange}
-            category={category}
-            setCategory={setCategory}
-            difficulty={difficulty}
-            setDifficulty={setDifficulty}
-            resetPoints={resetPoints}
-          />
-        )}
+    <main className="bg-gray-800 min-h-screen p-4">
+      <div>
+        <Link href="/">
+          <b className="absolute top-0 left-0 m-4 bg-gray-500 text-white px-4 py-2 rounded">
+            Voltar
+          </b>
+        </Link>
       </div>
-    </div>
+
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col gap-4 w-full max-w-sm px-4">
+          {gameStarted ? (
+            <GameStarted
+              message={message}
+              isAdmin={isAdmin}
+              resetGame={resetGame}
+              decideWinner={handleRoundWinner}
+            />
+          ) : (
+            <GameHome
+              players={players}
+              startGame={startGame}
+              isAdmin={isAdmin}
+              removePlayer={removePlayer}
+            />
+          )}
+          {isAdmin && !gameStarted && (
+            <GameSetup
+              imposterChances={imposterChances}
+              handleImposterChange={handleImposterChange}
+              category={category}
+              setCategory={setCategory}
+              difficulty={difficulty}
+              setDifficulty={setDifficulty}
+              resetPoints={resetPoints}
+            />
+          )}
+        </div>
+      </div>
+    </main>
   );
 }
