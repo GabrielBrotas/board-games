@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +11,13 @@ func main() {
 		log.Fatalf("OPENAI_KEY environment variable not set")
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
 	http.HandleFunc("/ws", handleConnections)
-	fmt.Println("Server running on localhost:8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+
+	log.Printf("Server running on port %s", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
