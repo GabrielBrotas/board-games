@@ -62,6 +62,7 @@ func setupRouter() *mux.Router {
 // setupCORS configures Cross-Origin Resource Sharing (CORS) settings.
 func setupCORS(r *mux.Router) http.Handler {
 	cors_origins := strings.Split(os.Getenv("CORS_ORIGINS"), ",")
+	log.Printf("CORS origins: %v", cors_origins)
 	return handlers.CORS(
 		handlers.AllowedOrigins(cors_origins),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
