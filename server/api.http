@@ -1,0 +1,32 @@
+@host=http://localhost:8081
+@gbrotasId = "01bb0ed5-ec16-4697-8514-58e1c839b3de"
+@rafaId = "e12f3925-f081-437f-813e-c8c307c13026"
+@brunaId = "836f372f-e862-4db2-a876-23f86ff1d753"
+
+###
+GET {{host}}/users
+
+###
+POST {{host}}/login
+Content-Type: application/json
+
+{
+  "name": "gbrotas"
+}
+
+###
+GET {{host}}/users/{{rafaId}}
+
+###
+PUT {{host}}/users/{{rafaId}}
+Content-Type: application/json
+
+{
+  "name": "gbrotas 22"
+}
+
+###
+GET {{host}}/player-list
+
+###
+GET {{host}}/game-status?u={{rafaId}}

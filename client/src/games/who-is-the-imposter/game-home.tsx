@@ -45,7 +45,7 @@ export const GameHome = ({
           Start Game
         </button>
       ) : (
-        <p>Esperando o host iniciar o jogo</p>
+        <p className="text-center">Esperando o host iniciar o jogo</p>
       )}
     </div>
   );
