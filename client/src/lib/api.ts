@@ -25,7 +25,7 @@ type GameStatusResponse = {
 const getImposterGameStatus = async (
   userID: string
 ): Promise<GameStatusResponse> => {
-  const response = await baseAPI.get(`/game-status?u=${userID}`);
+  const response = await baseAPI.get(`/games/impostor/status?u=${userID}`);
   return response.data;
 };
 

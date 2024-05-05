@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"sort"
 
+	"github.com/GabrielBrotas/board-games/internal/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -26,6 +27,23 @@ func NewGameManager(playerRepository *PlayerRepository) *GameManager {
 		playerRepository: playerRepository,
 		gameStarted:      false,
 	}
+}
+
+// RegisterPlayer
+func (gm *GameManager) RegisterPlayer(conn *websocket.Conn, user *models.User) error {
+	player := gm.GetPlayerByID(user.ID)
+
+	if player == nil {
+		newPlayer, err := NewPlayer(user)
+		if err != nil {
+			return err
+		}
+		gm.AddPlayer(newPlayer)
+		player = newPlayer
+	}
+
+	player.User.UpdateConnection(conn)
+	return nil
 }
 
 func (gm *GameManager) AddPlayer(player *Player) {
@@ -247,7 +265,7 @@ func (gm *GameManager) GetPlayerList(all bool) []*Player {
 
 type GameStatus struct {
 	GameStarted bool   `json:"gameStarted"`
-	WordOrRole  string `json:"wordOrRole"`
+	WordOrRole  string `json:"word"`
 	InGame      bool   `json:"inGame"`
 }
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/GabrielBrotas/who-is-the-imposter/internal/models"
+	"github.com/GabrielBrotas/board-games/internal/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -89,13 +89,13 @@ func (r *UserRepository) RemoveUser(id uuid.UUID) error {
 }
 
 // GetUsers returns a list of all users in the repository.
-func (r *UserRepository) GetUsers() []*models.User {
+func (r *UserRepository) GetUsers() []*models.UserOut {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	users := make([]*models.User, 0, len(r.users))
+	users := make([]*models.UserOut, 0, len(r.users))
 	for _, user := range r.users {
-		users = append(users, user)
+		users = append(users, user.ToOut())
 	}
 
 	return users

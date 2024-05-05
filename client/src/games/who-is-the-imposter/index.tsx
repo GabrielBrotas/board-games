@@ -40,7 +40,7 @@ export function WhoIsTheImposter() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const newWs = new WebSocket(`${process.env.NEXT_PUBLIC_WS_API_URL}/ws`);
+    const newWs = new WebSocket(`${process.env.NEXT_PUBLIC_WS_API_URL}/games/impostor/ws`);
     setWs(newWs);
 
     newWs.onopen = () => handleWebSocketOpen(newWs);

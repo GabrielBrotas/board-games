@@ -1,4 +1,4 @@
-module github.com/GabrielBrotas/who-is-the-imposter
+module github.com/GabrielBrotas/board-games
 
 go 1.21.9
 

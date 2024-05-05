@@ -4,42 +4,66 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
-	"github.com/GabrielBrotas/who-is-the-imposter/internal/repository"
+	"github.com/GabrielBrotas/board-games/internal/repository"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
-var (
-	usersRepository = repository.NewUserRepository()
-)
+var usersRepository = repository.NewUserRepository()
 
 func main() {
-	if os.Getenv("OPENAI_KEY") == "" {
-		log.Fatalf("OPENAI_KEY environment variable not set")
+	ensureEnvironmentVariables()
+
+	r := setupRouter()
+
+	log.Printf("Server running on port %s", os.Getenv("PORT"))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), setupCORS(r)))
+}
+
+func ensureEnvironmentVariables() {
+	requiredEnvVars := map[string]string{
+		"OPENAI_KEY": "OPENAI_KEY environment variable not set",
+		"PORT":       "PORT environment variable must be set",
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("$PORT must be set")
+	for envVar, errMsg := range requiredEnvVars {
+		if value := os.Getenv(envVar); value == "" {
+			log.Fatalf(errMsg)
+		}
 	}
+}
 
+func setupRouter() *mux.Router {
 	r := mux.NewRouter()
 
+	// API version endpoint
+	r.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"version": "0.1.0"}`))
+	}).Methods(http.MethodGet)
+
+	// User management endpoints
 	r.HandleFunc("/login", handleCreateUserOrLogin).Methods(http.MethodPost)
 	r.HandleFunc("/users", handleGetUsers).Methods(http.MethodGet)
 	r.HandleFunc("/users/{id}", handleGetUser).Methods(http.MethodGet)
 	r.HandleFunc("/users/{id}", handleUpdateUser).Methods(http.MethodPut)
 
-	r.HandleFunc("/ws", handleConnections)
-	r.HandleFunc("/player-list", handleGetPlayerList)
-	r.HandleFunc("/game-status", handleGetGameStatus)
+	// Game-specific routes for the "Impostor" game
+	r.HandleFunc("/games/impostor/ws", handleConnections)
+	r.HandleFunc("/games/impostor/player-list", handleGetPlayerList)
+	r.HandleFunc("/games/impostor/status", handleGetGameStatus)
 
-	// Configure CORS to allow all origins
-	corsOrigins := handlers.AllowedOrigins([]string{"*"})
-	corsMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
-	corsHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	return r
+}
 
-	log.Printf("Server running on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(corsOrigins, corsMethods, corsHeaders)(r)))
+// setupCORS configures Cross-Origin Resource Sharing (CORS) settings.
+func setupCORS(r *mux.Router) http.Handler {
+	return handlers.CORS(
+		handlers.AllowedOrigins(strings.Split(os.Getenv("CORS_ORIGINS"), ",")),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+	)(r)
 }

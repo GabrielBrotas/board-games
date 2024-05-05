@@ -1,7 +1,7 @@
 package imposter
 
 import (
-	"github.com/GabrielBrotas/who-is-the-imposter/internal/models"
+	"github.com/GabrielBrotas/board-games/internal/models"
 	"github.com/google/uuid"
 )
 

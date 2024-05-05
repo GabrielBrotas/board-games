@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	game "github.com/GabrielBrotas/who-is-the-imposter/internal/games/imposter"
+	game "github.com/GabrielBrotas/board-games/internal/games/imposter"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -21,6 +21,7 @@ var (
 	gameManager = game.NewGameManager(game.NewPlayerRepository())
 )
 
+// handleGetPlayerList retrieves the list of players.
 func handleGetPlayerList(w http.ResponseWriter, r *http.Request) {
 	players := gameManager.GetPlayerList(true)
 	playerList := make([]game.PlayerOut, 0, len(players))
@@ -28,11 +29,11 @@ func handleGetPlayerList(w http.ResponseWriter, r *http.Request) {
 	for _, player := range players {
 		playerList = append(playerList, *player.ToOut())
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf(`{"players": %v}`, playerList)))
+
+	respondWithJSON(w, http.StatusOK, map[string]interface{}{"players": playerList})
 }
 
+// handleConnections upgrades HTTP to WebSocket and handles the connection.
 func handleConnections(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -75,12 +76,13 @@ func processMessage(conn *websocket.Conn, msg map[string]interface{}) error {
 	case "resetGame":
 		gameManager.ResetGame()
 	case "removePlayer":
-		return handleRemovePlayer(msg)
+		return handleRemovePlayer(msg) // v
 	case "decideWinner":
 		return handleDecideWinner(msg)
 	case "resetPoints":
 		gameManager.ResetPoints()
 		gameManager.BroadcastPlayerList()
+		return nil
 	default:
 		return fmt.Errorf("unknown message type: %v", msg["type"])
 	}
@@ -88,77 +90,48 @@ func processMessage(conn *websocket.Conn, msg map[string]interface{}) error {
 }
 
 func handleConnected(conn *websocket.Conn, msg map[string]interface{}) error {
-	id, ok := msg["id"].(string)
-	if !ok {
-		return fmt.Errorf("invalid id value")
-	}
-
-	userID, err := uuid.Parse(id)
-
+	userID, err := parseUUID(msg, "id")
 	if err != nil {
 		return err
 	}
 
 	user, err := usersRepository.GetUser(userID)
-
 	if err != nil {
 		return err
 	}
 
-	player := gameManager.GetPlayerByID(user.ID)
-
-	if player == nil {
-		newPlayer, err := game.NewPlayer(user)
-		if err != nil {
-			return err
-		}
-		gameManager.AddPlayer(newPlayer)
-		player = newPlayer
+	err = gameManager.RegisterPlayer(conn, user)
+	if err != nil {
+		return err
 	}
 
-	player.User.UpdateConnection(conn)
 	gameManager.BroadcastPlayerList()
-
 	return nil
 }
 
+// handleStartGame initializes a new game with specified settings.
 func handleStartGame(msg map[string]interface{}) error {
-	dist := game.ImposterDistribution{
-		One:   int(msg["one"].(float64)),
-		Two:   int(msg["two"].(float64)),
-		Three: int(msg["three"].(float64)),
-	}
+	dist := parseDistribution(msg)
 	category, _ := msg["category"].(string)
 	difficulty, _ := msg["difficulty"].(string)
 	gameManager.StartGame(dist, category, difficulty)
 	return nil
 }
 
+// handleRemovePlayer removes a player from the game.
 func handleRemovePlayer(msg map[string]interface{}) error {
-	log.Printf("Received removePlayer message: %v", msg)
-	id, ok := msg["id"].(string)
-	if !ok {
-		return fmt.Errorf("invalid id value")
-	}
-
-	userID, err := uuid.Parse(id)
-
+	userID, err := parseUUID(msg, "id")
 	if err != nil {
 		return err
 	}
-
-	log.Printf("Removing player: %s", userID)
 	gameManager.RemovePlayerByID(userID)
 	gameManager.BroadcastPlayerList()
 	return nil
 }
 
+// handleDecideWinner updates the game state based on the winner
 func handleDecideWinner(msg map[string]interface{}) error {
-	log.Printf("Received decideWinner message: %v", msg)
-	impostorWon, ok := msg["impostorWon"].(bool)
-	if !ok {
-		return fmt.Errorf("invalid impostorWon value")
-	}
+	impostorWon, _ := msg["impostorWon"].(bool)
 	gameManager.UpdatePoints(impostorWon)
 	gameManager.BroadcastPlayerList()
 	gameManager.ResetGame()
@@ -166,6 +139,7 @@ func handleDecideWinner(msg map[string]interface{}) error {
 	return nil
 }
 
+// handleGetGameStatus returns the current game status for a user.
 func handleGetGameStatus(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("u")
 	userID, err := uuid.Parse(id)
@@ -184,7 +158,14 @@ func handleGetGameStatus(w http.ResponseWriter, r *http.Request) {
 
 	gameInfo := gameManager.GetGameStatus(user.ID)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf(`{"gameStarted": %v, "word": "%s", "inGame": %v}`, gameInfo.GameStarted, gameInfo.WordOrRole, gameInfo.InGame)))
+	respondWithJSON(w, http.StatusOK, gameInfo)
+}
+
+// parseDistribution extracts game distribution settings from a message.
+func parseDistribution(msg map[string]interface{}) game.ImposterDistribution {
+	return game.ImposterDistribution{
+		One:   int(msg["one"].(float64)),
+		Two:   int(msg["two"].(float64)),
+		Three: int(msg["three"].(float64)),
+	}
 }
