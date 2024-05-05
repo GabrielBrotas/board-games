@@ -6,6 +6,9 @@ import { GameHome } from "./game-home";
 import { GameStarted } from "./game-started";
 import { GameSetup } from "./admin-game-setup";
 import { useRouter } from "next/navigation";
+import { Loading } from "@/components/loading";
+import { toast } from "react-hot-toast";
+import { api } from "@/lib/api";
 
 export type IPlayer = {
   id: string;
@@ -18,6 +21,8 @@ export function WhoIsTheImposter() {
   const router = useRouter();
 
   // Game state
+  const [loadingGameStatus, setLoadingGameStatus] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [players, setPlayers] = useState([]);
   const [message, setMessage] = useState("");
   const [gameStarted, setGameStarted] = useState(false);
@@ -46,18 +51,28 @@ export function WhoIsTheImposter() {
       console.log("Closing connection...");
       newWs.close();
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (!isLoading && ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: "changeName", newName: user }));
+    if (!isLoading && user) {
+      api
+        .getImposterGameStatus(user.id)
+        .then((data) => {
+          setGameStarted(data.gameStarted);
+          setMessage(data.word);
+          setIsPlaying(data.inGame);
+          setLoadingGameStatus(false);
+        })
+        .catch((error) => {
+          console.error("Error getting game status: ", error);
+          setLoadingGameStatus(false);
+        });
     }
-  }, [user, isLoading, ws?.readyState]);
+  }, [user, isLoading]);
 
   const handleWebSocketOpen = (newWs: WebSocket) => {
-    console.log("Connected to server");
-    if (newWs.readyState === WebSocket.OPEN) {
-      newWs.send(JSON.stringify({ type: "changeName", newName: user }));
+    if (newWs.readyState === WebSocket.OPEN && user) {
+      newWs.send(JSON.stringify({ type: "connected", id: user.id }));
     } else {
       console.error("WebSocket is not open.");
     }
@@ -65,7 +80,6 @@ export function WhoIsTheImposter() {
 
   const handleWebSocketMessage = (event: MessageEvent<any>) => {
     const data = JSON.parse(event.data);
-
     switch (data.type) {
       case "playerList":
         setPlayers(data.players);
@@ -73,13 +87,27 @@ export function WhoIsTheImposter() {
       case "role":
         setMessage(data.wordOrRole);
         setGameStarted(true);
+        setIsPlaying(true);
         break;
       case "resetGame":
         setGameStarted(false);
         setMessage("");
         break;
       case "removedPlayer":
-        router.push("/", { scroll: false });
+        router.push("/games", { scroll: false });
+        break;
+      case "winner":
+        const impostorsWon = data.impostorsWon as boolean;
+        if (impostorsWon) {
+          toast.success("Impostores venceram!", {
+            duration: 3000,
+          });
+        } else {
+          toast.success("Tripulantes venceram!", {
+            duration: 3000,
+          });
+        }
+        break;
       default:
         break;
     }
@@ -116,7 +144,7 @@ export function WhoIsTheImposter() {
     }
   };
 
-  const handleImposterChange = (key: string, value: string) => {
+  const handleNumberOfImposterChange = (key: string, value: string) => {
     const newChances = { ...imposterChances, [key]: parseInt(value) };
     setImposterChances(newChances);
   };
@@ -124,7 +152,7 @@ export function WhoIsTheImposter() {
   const removePlayer = (id: string) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       console.log("Removing player with id: ", id);
-      ws.send(JSON.stringify({ type: "removePlayer", playerID: id }));
+      ws.send(JSON.stringify({ type: "removePlayer", id: id }));
     }
   };
 
@@ -134,10 +162,14 @@ export function WhoIsTheImposter() {
     }
   };
 
+  if (isLoading || loadingGameStatus) {
+    return <Loading />;
+  }
+
   return (
     <main className="bg-gray-800 min-h-screen p-4">
       <div>
-        <Link href="/">
+        <Link href="/games">
           <b className="absolute top-0 left-0 m-4 bg-gray-500 text-white px-4 py-2 rounded">
             Voltar
           </b>
@@ -152,6 +184,7 @@ export function WhoIsTheImposter() {
               isAdmin={isAdmin}
               resetGame={resetGame}
               decideWinner={handleRoundWinner}
+              inGame={isPlaying}
             />
           ) : (
             <GameHome
@@ -164,7 +197,7 @@ export function WhoIsTheImposter() {
           {isAdmin && !gameStarted && (
             <GameSetup
               imposterChances={imposterChances}
-              handleImposterChange={handleImposterChange}
+              handleImposterChange={handleNumberOfImposterChange}
               category={category}
               setCategory={setCategory}
               difficulty={difficulty}

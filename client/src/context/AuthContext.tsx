@@ -1,43 +1,53 @@
 // context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { api } from "@/lib/api";
+
+type User = {
+  id: string;
+  name: string;
+};
 
 interface AuthContextType {
-  user: string | null;
-  login: (username: string) => void;
-  changeUsername: (username: string) => void;
+  user: User | null;
   isAdmin: boolean;
   isLoading: boolean;
+  createUserOrLogin: (name: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isAdmin = user === "gbrotas";
+  const isAdmin = user?.name === "gbrotas";
 
   useEffect(() => {
-    const username = Cookies.get("username");
-    if (username) {
-      setUser(username);
+    const user = Cookies.get("user");
+    if (user) {
+      const userParsed = JSON.parse(user);
+      setUser(userParsed);
     }
     setIsLoading(false);
   }, []);
 
-  const login = (username: string) => {
-    Cookies.set("username", username, { expires: 7 });
-    setUser(username);
+  const createUserOrLogin = async (name: string) => {
+    const user = await api.createUserOrLogin(name);
+    Cookies.set("user", JSON.stringify(user), { expires: 7 });
+    setUser(user);
   };
 
-  const changeUsername = (username: string) => {
-    Cookies.set("username", username, { expires: 7 });
-    setUser(username);
+  const logout = () => {
+    setIsLoading(true);
+    Cookies.remove("user");
+    setUser(null);
+    setIsLoading(false);
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, login, changeUsername, isAdmin, isLoading }}
+      value={{ user, createUserOrLogin, logout, isAdmin, isLoading }}
     >
       {children}
     </AuthContext.Provider>

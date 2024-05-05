@@ -20,3 +20,9 @@ docs for more detail on building and pushing.
 
 ### References
 * [Docker's Go guide](https://docs.docker.com/language/golang/)
+
+## TODO:
+- partida em progresso
+  - se nao tiver InPlay aguardar, caso contrario mostrar mensagem
+
+- fix error removing player
