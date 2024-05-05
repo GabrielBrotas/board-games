@@ -3,7 +3,9 @@ package imposter
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -30,39 +32,38 @@ func generateWordFromOpenAI(category string, difficulty string) (string, error) 
 		return "", fmt.Errorf("OPENAI_KEY environment variable not set")
 	}
 
-	// client := openai.NewClient(openAIKey)
+	client := openai.NewClient(openAIKey)
 
-	// prompt := ""
-	// if category == "" {
-	// 	prompt = promptContext + " por favor selecione uma palavra aleatória para ser distribuída para os jogadores relacionada a qualquer categoria dentre as seguintes: " + topicos
-	// } else {
-	// 	prompt = promptContext + " por favor selecione uma palavra relacionada a categoria '" + category + "' para ser distribuída para os jogadores."
-	// }
+	prompt := ""
+	if category == "" {
+		prompt = promptContext + " por favor selecione uma palavra aleatória para ser distribuída para os jogadores relacionada a qualquer categoria dentre as seguintes: " + topicos
+	} else {
+		prompt = promptContext + " por favor selecione uma palavra relacionada a categoria '" + category + "' para ser distribuída para os jogadores."
+	}
 
-	// if difficulty != "" {
-	// 	prompt = prompt + " A palavra deve ser de dificuldade " + difficulty + "."
-	// }
+	if difficulty != "" {
+		prompt = prompt + " A palavra deve ser de dificuldade " + difficulty + "."
+	}
 
-	// // Attempt to generate a unique word
-	// var word string
-	// var err error
-	// for attempts := 0; attempts < 10; attempts++ { // Limit the number of attempts to avoid infinite loops
-	// 	word, err = attemptToGenerateUniqueWord(client, prompt)
-	// 	if err != nil {
-	// 		log.Printf("Error generating word from OpenAI: %v", err)
-	// 		return "", err
-	// 	}
-	// 	if _, exists := usedWords[word]; !exists {
-	// 		usedWords[word] = true
-	// 		return word, nil
-	// 	}
-	// 	// Log the event of a duplicate word
-	// 	log.Println("Duplicate word generated, attempting again...")
-	// 	time.Sleep(1) // Sleep for 1 second to avoid rate limiting
-	// }
-	// fmt.Println("failed to generate a unique word after several attempts")
-	// return word, nil
-	return "teste", nil
+	// Attempt to generate a unique word
+	var word string
+	var err error
+	for attempts := 0; attempts < 10; attempts++ { // Limit the number of attempts to avoid infinite loops
+		word, err = attemptToGenerateUniqueWord(client, prompt)
+		if err != nil {
+			log.Printf("Error generating word from OpenAI: %v", err)
+			return "", err
+		}
+		if _, exists := usedWords[word]; !exists {
+			usedWords[word] = true
+			return word, nil
+		}
+		// Log the event of a duplicate word
+		log.Println("Duplicate word generated, attempting again...")
+		time.Sleep(1) // Sleep for 1 second to avoid rate limiting
+	}
+	fmt.Println("failed to generate a unique word after several attempts")
+	return word, nil
 }
 
 func attemptToGenerateUniqueWord(client *openai.Client, prompt string) (string, error) {
