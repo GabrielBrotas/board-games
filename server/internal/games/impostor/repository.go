@@ -1,9 +1,10 @@
-package imposter
+package impostor
 
 import (
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
 
 // PlayerRepository is an in-memory storage for Player objects.
@@ -27,6 +28,16 @@ func (r *PlayerRepository) GetPlayerByID(id uuid.UUID) *Player {
 	}
 
 	return player
+}
+
+// GetPlayerByConnection retrieves a player by its connection.
+func (r *PlayerRepository) GetPlayerByConnection(conn *websocket.Conn) *Player {
+	for _, player := range r.players {
+		if player.Conn == conn {
+			return player
+		}
+	}
+	return nil
 }
 
 func (r *PlayerRepository) AddPlayer(player *Player) {
@@ -64,7 +75,7 @@ func (r *PlayerRepository) GetPlayerList(all bool) []*Player {
 	players := make([]*Player, 0, len(r.players))
 	for _, player := range r.players {
 		// all, or in the game, or connected to the room
-		if all || player.InPlay || player.User.Conn != nil {
+		if all || player.InPlay || player.Conn != nil {
 			players = append(players, player)
 		}
 	}
@@ -74,7 +85,7 @@ func (r *PlayerRepository) GetPlayerList(all bool) []*Player {
 func (r *PlayerRepository) GetActiveUsersCount() int {
 	activeUsers := 0
 	for _, player := range r.players {
-		if player.User.Conn != nil {
+		if player.Conn != nil {
 			activeUsers++
 		}
 	}

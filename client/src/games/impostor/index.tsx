@@ -40,7 +40,9 @@ export function WhoIsTheImposter() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const newWs = new WebSocket(`${process.env.NEXT_PUBLIC_WS_API_URL}/games/impostor/ws`);
+    const newWs = new WebSocket(
+      `${process.env.NEXT_PUBLIC_WS_API_URL}/games/impostor/ws`
+    );
     setWs(newWs);
 
     newWs.onopen = () => handleWebSocketOpen(newWs);
@@ -108,6 +110,11 @@ export function WhoIsTheImposter() {
           });
         }
         break;
+      case "impostorsNumber":
+        toast.success(`Há ${data.impostorsNumber} impostores na partida.`, {
+          duration: 3000,
+        });
+        break;
       default:
         break;
     }
@@ -162,6 +169,12 @@ export function WhoIsTheImposter() {
     }
   };
 
+  const showImpostorsNumber = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "showImpostorsNumber" }));
+    }
+  };
+
   if (isLoading || loadingGameStatus) {
     return <Loading />;
   }
@@ -185,6 +198,7 @@ export function WhoIsTheImposter() {
               resetGame={resetGame}
               decideWinner={handleRoundWinner}
               inGame={isPlaying}
+              showImpostorsNumber={showImpostorsNumber}
             />
           ) : (
             <GameHome

@@ -6,7 +6,6 @@ import (
 
 	"github.com/GabrielBrotas/board-games/internal/models"
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 )
 
 // UserRepository is an in-memory storage for User objects.
@@ -99,16 +98,4 @@ func (r *UserRepository) GetUsers() []*models.UserOut {
 	}
 
 	return users
-}
-
-// RemoveUserConn removes the connection from a user.
-func (r *UserRepository) RemoveUserConn(Conn *websocket.Conn) {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-
-	for _, user := range r.users {
-		if user.Conn == Conn {
-			user.Conn = nil
-		}
-	}
 }

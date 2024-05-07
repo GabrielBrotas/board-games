@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 import imposterImg from "../../../public/images/who-is-the-imposter.jpg";
+import spyfallImg from "../../../public/images/spyfall.jpg";
 import { useAuth } from "@/context/AuthContext";
 import { Loading } from "@/components/loading";
 
@@ -45,6 +46,12 @@ const games = [
     slug: "imposter",
     image: imposterImg,
   },
+  {
+    id: 2,
+    name: "Spyfall",
+    slug: "spyfall",
+    image: spyfallImg,
+  }
 ];
 
 export default function Home() {
@@ -78,7 +85,8 @@ export default function Home() {
         </h1>
 
         {user ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex gap-4 flex-wrap justify-center items-center">
             {games.map((game) => (
               <GameCard key={game.id} game={game} />
             ))}

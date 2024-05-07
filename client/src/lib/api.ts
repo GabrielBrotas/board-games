@@ -17,19 +17,37 @@ const createUserOrLogin = async (name: string): Promise<CreateUserResponse> => {
   return response.data;
 };
 
-type GameStatusResponse = {
+type ImposterGameStatusResponse = {
   gameStarted: boolean;
   word: string;
   inGame: boolean;
 };
+
 const getImposterGameStatus = async (
   userID: string
-): Promise<GameStatusResponse> => {
+): Promise<ImposterGameStatusResponse> => {
   const response = await baseAPI.get(`/games/impostor/status?u=${userID}`);
   return response.data;
 };
 
+type SpyfallGameStatusResponse = {
+  gameStarted: boolean;
+  inGame: boolean;
+  role: string;
+  location: string;
+};
+
+const getSpyfallGameStatus = async (
+  userID: string
+): Promise<SpyfallGameStatusResponse> => {
+  const response = await baseAPI.get(`/games/spyfall/status?u=${userID}`);
+  return response.data;
+};
+
+
+
 export const api = {
   createUserOrLogin,
   getImposterGameStatus,
+  getSpyfallGameStatus,
 };

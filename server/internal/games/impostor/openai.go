@@ -1,4 +1,4 @@
-package imposter
+package impostor
 
 import (
 	"context"
@@ -64,6 +64,7 @@ func generateWordFromOpenAI(category string, difficulty string) (string, error) 
 	}
 	fmt.Println("failed to generate a unique word after several attempts")
 	return word, nil
+	// return "testword", nil
 }
 
 func attemptToGenerateUniqueWord(client *openai.Client, prompt string) (string, error) {

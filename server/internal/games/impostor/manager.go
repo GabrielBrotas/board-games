@@ -1,4 +1,4 @@
-package imposter
+package impostor
 
 import (
 	"log"
@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type ImposterDistribution struct {
+type ImpostorDistribution struct {
 	One   int
 	Two   int
 	Three int
@@ -29,38 +29,32 @@ func NewGameManager(playerRepository *PlayerRepository) *GameManager {
 	}
 }
 
-// RegisterPlayer
+// RegisterPlayer registers a player in the game
 func (gm *GameManager) RegisterPlayer(conn *websocket.Conn, user *models.User) error {
-	player := gm.GetPlayerByID(user.ID)
+	player := gm.playerRepository.GetPlayerByID(user.ID)
 
 	if player == nil {
 		newPlayer, err := NewPlayer(user)
 		if err != nil {
 			return err
 		}
-		gm.AddPlayer(newPlayer)
+		gm.playerRepository.AddPlayer(newPlayer)
+
 		player = newPlayer
 	}
 
-	player.User.UpdateConnection(conn)
+	player.UpdateConnection(conn)
 	return nil
 }
 
-func (gm *GameManager) AddPlayer(player *Player) {
-	gm.playerRepository.AddPlayer(player)
-}
-
-func (gm *GameManager) GetPlayerByID(id uuid.UUID) *Player {
-	return gm.playerRepository.GetPlayerByID(id)
-}
-
+// RemovePlayerByID removes a player from the game by its ID
 func (gm *GameManager) RemovePlayerByID(id uuid.UUID) {
 	player := gm.playerRepository.GetPlayerByID(id)
 	gm.playerRepository.RemovePlayerByID(id)
 
-	if player.User != nil && player.User.Conn != nil {
+	if player.Conn != nil {
 		log.Printf("Removing player %s", player.User.Name)
-		err := player.User.Conn.WriteJSON(map[string]interface{}{
+		err := player.Conn.WriteJSON(map[string]interface{}{
 			"type": "removedPlayer",
 		})
 
@@ -70,29 +64,17 @@ func (gm *GameManager) RemovePlayerByID(id uuid.UUID) {
 	}
 }
 
-func (gm *GameManager) SendPlayerList(conn *websocket.Conn) {
-	players := gm.playerRepository.GetPlayerList(false)
-	playersOut := make([]*PlayerOut, 0, len(players))
-	for _, player := range players {
-		playersOut = append(playersOut, player.ToOut())
-	}
-
-	if conn == nil {
-		log.Println("Connection is nil")
+func (gm *GameManager) RemoveConnection(conn *websocket.Conn) {
+	player := gm.playerRepository.GetPlayerByConnection(conn)
+	if player == nil {
 		return
 	}
 
-	err := conn.WriteJSON(map[string]interface{}{
-		"type":    "playerList",
-		"players": playersOut,
-	})
-	if err != nil {
-		log.Printf("Error sending player list: %v", err)
-	}
+	player.UpdateConnection(nil)
 }
 
+// BroadcastPlayerList broadcasts the player list to all players
 func (gm *GameManager) BroadcastPlayerList() {
-	log.Println("Broadcasting player list")
 	players := gm.playerRepository.GetPlayerList(false)
 	playersOut := make([]*PlayerOut, 0, len(players))
 	for _, player := range players {
@@ -100,54 +82,28 @@ func (gm *GameManager) BroadcastPlayerList() {
 	}
 
 	// sort players by points
-	log.Println("Sorting players by points")
 	sort.Slice(playersOut, func(i, j int) bool {
 		return playersOut[i].Points > playersOut[j].Points
 	})
 
-	log.Println("Broadcasting player list to connected players")
 	for _, player := range players {
-		if player == nil || player.User == nil {
+		if player == nil || player.Conn == nil {
 			continue
 		}
-		log.Printf("Player: %s, Points: %d", player.User.Name, player.Points)
 
-		if player.User != nil && player.User.Conn != nil {
-			log.Printf("Broadcasting player list to %s", player.User.Name)
-			err := player.User.Conn.WriteJSON(map[string]interface{}{
-				"type":    "playerList",
-				"players": playersOut,
-			})
+		err := player.Conn.WriteJSON(map[string]interface{}{
+			"type":    "playerList",
+			"players": playersOut,
+		})
 
-			if err != nil {
-				log.Printf("Error broadcasting player list: %v", err)
-			}
+		if err != nil {
+			log.Printf("Error broadcasting player list: %v", err)
 		}
 	}
-	log.Println("Broadcasting player list done")
 }
 
-func (gm *GameManager) ResetGame() {
-	players := gm.playerRepository.GetPlayerList(false)
-
-	for _, player := range players {
-		player.UnsetImpostor()
-		player.UnsetInPlay()
-		if player.User != nil && player.User.Conn != nil {
-			err := player.User.Conn.WriteJSON(map[string]interface{}{
-				"type": "resetGame",
-			})
-			if err != nil {
-				log.Printf("Error sending reset: %v", err)
-			}
-		}
-	}
-
-	gm.gameStarted = false
-	gm.word = ""
-}
-
-func (gm *GameManager) StartGame(dist ImposterDistribution, category string, difficulty string) {
+// StartGame starts the game
+func (gm *GameManager) StartGame(dist ImpostorDistribution, category string, difficulty string) {
 	word, err := generateWordFromOpenAI(category, difficulty)
 
 	if err != nil {
@@ -155,7 +111,7 @@ func (gm *GameManager) StartGame(dist ImposterDistribution, category string, dif
 		return
 	}
 
-	numImposters := chooseImpostersNumber(dist)
+	numImpostors := chooseImpostorsNumber(dist)
 
 	// Create a slice of player IDs to properly select random players.
 	playerIDs := make([]uuid.UUID, 0, gm.playerRepository.GetActiveUsersCount())
@@ -166,13 +122,13 @@ func (gm *GameManager) StartGame(dist ImposterDistribution, category string, dif
 
 	chosen := make(map[uuid.UUID]bool)
 
-	for i := 0; i < numImposters; i++ {
+	for i := 0; i < numImpostors; i++ {
 		for {
 			// Randomly select a player index.
 			idx := rand.Intn(len(playerIDs))
 			playerID := playerIDs[idx]
 			if !chosen[playerID] {
-				player := gm.GetPlayerByID(playerID)
+				player := gm.playerRepository.GetPlayerByID(playerID)
 				player.SetImpostor()
 				chosen[playerID] = true
 				break
@@ -188,10 +144,10 @@ func (gm *GameManager) StartGame(dist ImposterDistribution, category string, dif
 		if player.IsImpostor {
 			message = "Você é o impostor!"
 		}
-		if player.User.Conn == nil {
+		if player.Conn == nil {
 			continue
 		}
-		err := player.User.Conn.WriteJSON(map[string]interface{}{
+		err := player.Conn.WriteJSON(map[string]interface{}{
 			"type":       "role",
 			"wordOrRole": message,
 		})
@@ -202,6 +158,50 @@ func (gm *GameManager) StartGame(dist ImposterDistribution, category string, dif
 
 	gm.gameStarted = true
 	gm.word = word
+}
+
+func (gm *GameManager) BroadcastImpostorsNumber() {
+	players := gm.playerRepository.GetPlayerList(false)
+	impostorsNumber := 0
+	for _, player := range players {
+		if player.InPlay && player.IsImpostor {
+			impostorsNumber++
+		}
+	}
+
+	for _, player := range players {
+		if player.User == nil || player.Conn == nil {
+			continue
+		}
+
+		err := player.Conn.WriteJSON(map[string]interface{}{
+			"type":            "impostorsNumber",
+			"impostorsNumber": impostorsNumber,
+		})
+		if err != nil {
+			log.Printf("Error sending spies number: %v", err)
+		}
+	}
+}
+
+func (gm *GameManager) ResetGame() {
+	players := gm.playerRepository.GetPlayerList(false)
+
+	for _, player := range players {
+		player.UnsetImpostor()
+		player.UnsetInPlay()
+		if player.Conn != nil {
+			err := player.Conn.WriteJSON(map[string]interface{}{
+				"type": "resetGame",
+			})
+			if err != nil {
+				log.Printf("Error sending reset: %v", err)
+			}
+		}
+	}
+
+	gm.gameStarted = false
+	gm.word = ""
 }
 
 func (gm *GameManager) UpdatePoints(impostorsWin bool) {
@@ -237,12 +237,12 @@ func (gm *GameManager) BroadcastWinner(impostorsWin bool) {
 	log.Printf("Broadcasting winner")
 	players := gm.playerRepository.GetPlayerList(false)
 	for _, player := range players {
-		if player.User == nil || player.User.Conn == nil {
+		if player.Conn == nil {
 			continue
 		}
 
 		log.Printf("Broadcasting winner to %s", player.User.Name)
-		err := player.User.Conn.WriteJSON(map[string]interface{}{
+		err := player.Conn.WriteJSON(map[string]interface{}{
 			"type":         "winner",
 			"impostorsWon": impostorsWin,
 		})
@@ -295,7 +295,7 @@ func (gm *GameManager) GetGameStatus(playerID uuid.UUID) *GameStatus {
 	}
 }
 
-func chooseImpostersNumber(dist ImposterDistribution) int {
+func chooseImpostorsNumber(dist ImpostorDistribution) int {
 	roll := rand.Intn(100)
 	if roll < dist.One {
 		return 1

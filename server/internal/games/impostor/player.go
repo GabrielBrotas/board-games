@@ -1,8 +1,9 @@
-package imposter
+package impostor
 
 import (
 	"github.com/GabrielBrotas/board-games/internal/models"
 	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
 
 type Player struct {
@@ -10,6 +11,7 @@ type Player struct {
 	IsImpostor bool
 	Points     int
 	InPlay     bool
+	Conn       *websocket.Conn
 }
 
 func NewPlayer(user *models.User) (*Player, error) {
@@ -43,6 +45,10 @@ func (p *Player) SetInPlay() {
 
 func (p *Player) UnsetInPlay() {
 	p.InPlay = false
+}
+
+func (p *Player) UpdateConnection(conn *websocket.Conn) {
+	p.Conn = conn
 }
 
 type PlayerOut struct {

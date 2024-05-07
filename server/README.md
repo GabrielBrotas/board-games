@@ -22,7 +22,4 @@ docs for more detail on building and pushing.
 * [Docker's Go guide](https://docs.docker.com/language/golang/)
 
 ## TODO:
-- partida em progresso
-  - se nao tiver InPlay aguardar, caso contrario mostrar mensagem
-
-- fix error removing player
+- Generate Spyfall images and display it when the game start

@@ -52,9 +52,14 @@ func setupRouter() *mux.Router {
 	r.HandleFunc("/users/{id}", handleUpdateUser).Methods(http.MethodPut)
 
 	// Game-specific routes for the "Impostor" game
-	r.HandleFunc("/games/impostor/ws", handleConnections)
-	r.HandleFunc("/games/impostor/player-list", handleGetPlayerList)
-	r.HandleFunc("/games/impostor/status", handleGetGameStatus)
+	r.HandleFunc("/games/impostor/ws", handleImpostorConnections)
+	r.HandleFunc("/games/impostor/player-list", handleGetImpostorPlayerList)
+	r.HandleFunc("/games/impostor/status", handleImpostorGetGameStatus)
+
+	// Spyfall
+	r.HandleFunc("/games/spyfall/ws", handleSpyfallConnections)
+	r.HandleFunc("/games/spyfall/player-list", handleGetSpyfallPlayerList)
+	r.HandleFunc("/games/spyfall/status", handleSpyfallGetPlayerGameStatus)
 
 	return r
 }

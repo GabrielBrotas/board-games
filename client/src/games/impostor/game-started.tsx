@@ -7,6 +7,7 @@ interface GameStartedProps {
   resetGame: () => void;
   decideWinner: (impostorWon: boolean) => void;
   inGame: boolean;
+  showImpostorsNumber: () => void;
 }
 
 export const GameStarted = ({
@@ -15,6 +16,7 @@ export const GameStarted = ({
   resetGame,
   decideWinner,
   inGame,
+  showImpostorsNumber,
 }: GameStartedProps) => {
   return (
     <>
@@ -25,12 +27,18 @@ export const GameStarted = ({
         {inGame ? (
           <p className="mb-4 text-center">{message}</p>
         ) : (
-          <p className="mb-4 text-center">Esperando jogadores terminar a partida...</p>
+          <p className="mb-4 text-center">
+            Esperando jogadores terminar a partida...
+          </p>
         )}
       </div>
       {isAdmin && (
         <div className="bg-gray-900 text-white p-8 rounded-lg shadow-lg max-w-sm">
-          <GameControl resetGame={resetGame} decideWinner={decideWinner} />
+          <GameControl
+            resetGame={resetGame}
+            decideWinner={decideWinner}
+            showImpostorsNumber={showImpostorsNumber}
+          />
         </div>
       )}
     </>
