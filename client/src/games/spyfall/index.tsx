@@ -9,7 +9,9 @@ import { useRouter } from "next/navigation";
 import { Loading } from "@/components/loading";
 import { toast } from "react-hot-toast";
 import { api } from "@/lib/api";
-import Modal from "./location-modal";
+import { LocationModal } from "./location-modal";
+import { GameControl } from "./game-controls";
+import { QuestionsModal } from "./questions-modal";
 
 export type IPlayer = {
   id: string;
@@ -191,15 +193,18 @@ export function Spyfall() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <div className="flex flex-col gap-4 w-full max-w-sm px-4">
           {gameStarted ? (
-            <GameStarted
-              role={role}
-              location={location}
-              isAdmin={isAdmin}
-              resetGame={resetGame}
-              decideWinner={handleRoundWinner}
-              inGame={isPlaying}
-              showSpiesNumber={showSpiesNumber}
-            />
+            <>
+              <GameStarted role={role} location={location} inGame={isPlaying} />
+              {isAdmin && (
+                <div className="bg-gray-900 text-white p-8 rounded-lg shadow-lg max-w-sm">
+                  <GameControl
+                    resetGame={resetGame}
+                    decideWinner={handleRoundWinner}
+                    showSpiesNumber={showSpiesNumber}
+                  />
+                </div>
+              )}
+            </>
           ) : (
             <GameHome
               players={players}
@@ -208,7 +213,8 @@ export function Spyfall() {
               removePlayer={removePlayer}
             />
           )}
-          <Modal />
+          <LocationModal />
+          <QuestionsModal />
           {isAdmin && !gameStarted && (
             <GameSetup
               spiesChances={spiesChances}

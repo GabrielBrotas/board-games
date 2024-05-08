@@ -1,75 +1,74 @@
 import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
 
-const locations = [
+export const availableLocations = [
   {
-    Location: "Hospital",
-    slug: "hospital",
+    location: "Hospital",
     image: "/images/spyfall/hospital.jpg",
   },
   {
-    Location: "Estação Espacial",
-    slug: "estacao-espacial",
+    location: "Estação Espacial",
+    image: "/images/spyfall/space-station.jpg",
   },
   {
-    Location: "Supermercado",
-    slug: "supermercado",
+    location: "Supermercado",
+    image: "/images/spyfall/supermarket.jpg",
   },
   {
-    Location: "Submarino",
-    slug: "submarino",
+    location: "Submarino",
+    image: "/images/spyfall/submarine.jpg",
   },
   {
-    Location: "Banco",
-    slug: "banco",
+    location: "Banco",
+    image: "/images/spyfall/bank.jpg",
   },
   {
-    Location: "Escola",
-    slug: "escola",
+    location: "Escola",
+    image: "/images/spyfall/school.jpg",
   },
   {
-    Location: "Circo",
-    slug: "circo",
+    location: "Circo",
+    image: "/images/spyfall/circus.jpg",
   },
   {
-    Location: "Restaurante",
-    slug: "restaurante",
+    location: "Restaurante",
+    image: "/images/spyfall/restaurant.jpg",
   },
   {
-    Location: "Teatro",
-    slug: "teatro",
+    location: "Teatro",
+    image: "/images/spyfall/theater.jpg",
   },
   {
-    Location: "Aeroporto",
-    slug: "aeroporto",
+    location: "Aeroporto",
+    image: "/images/spyfall/airport.jpg",
   },
   {
-    Location: "Zoológico",
-    slug: "zoo",
+    location: "Zoológico",
+    image: "/images/spyfall/zoo.jpg",
   },
   {
-    Location: "Cassino",
-    slug: "cassino",
+    location: "Cassino",
+    image: "/images/spyfall/casino.jpg",
   },
   {
-    Location: "Navio Cruzeiro",
-    slug: "navio-cruzeiro",
+    location: "Navio Cruzeiro",
+    image: "/images/spyfall/cruise-ship.jpg",
   },
   {
-    Location: "Parque de Diversões",
-    slug: "parque-diversoes",
+    location: "Parque de Diversões",
+    image: "/images/spyfall/amusement-park.jpg",
   },
   {
-    Location: "Museu",
-    slug: "museu",
+    location: "Museu",
+    image: "/images/spyfall/museum.jpg",
   },
   {
-    Location: "Estúdio de TV",
-    slug: "estudio-tv",
+    location: "Estúdio de TV",
+    image: "/images/spyfall/tv-studio.jpg",
   },
 ];
 
-const LocationModal = () => {
+export const LocationModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
@@ -77,7 +76,7 @@ const LocationModal = () => {
   return (
     <div className="flex justify-center">
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         onClick={toggleModal}
       >
         Visualizar Localizações
@@ -88,17 +87,19 @@ const LocationModal = () => {
           <h2 className="text-xl text-white font-bold mb-4">Localizações</h2>
           <div className="overflow-y-auto">
             <ul className="list-disc list-inside px-4">
-              {locations.map((location, index) => (
+              {availableLocations.map((location, index) => (
                 <li
                   key={index}
                   className="text-white flex items-center gap-4 mb-4"
                 >
-                  <img
-                    src={"/images/spyfall/hospital.jpg"}
-                    alt={location.Location}
-                    className="w-32 h-32 object-cover"
-                  />
-                  {location.Location}
+                  {location.image && (
+                    <img
+                      src={location.image}
+                      alt={location.location}
+                      className="w-32 h-32 object-cover"
+                    />
+                  )}
+                  {location.location}
                 </li>
               ))}
             </ul>
@@ -132,5 +133,3 @@ const ModalComponent = ({ isOpen, onClose, children }: ModalProps) => {
     </div>
   );
 };
-
-export default LocationModal;
