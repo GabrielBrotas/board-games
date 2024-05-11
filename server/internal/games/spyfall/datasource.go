@@ -17,7 +17,7 @@ func getLocationAndRoles() []iLocationAndRoles {
 		},
 		{
 			Location: "Estação Espacial",
-			Roles:    []string{"Astronauta", "Engenheiro de Voo", "Comandante", "Biólogo", "Físico", "Médico", "Especialista em Comunicações", "Operador de Carga", "Técnico de Manutenção", "Cientista de Dados", "Psicólogo", "Meteorologista", "Engenheiro Robótico", "Químico", "Astrônomo", "Geólogo", "Nutricionista", "Piloto", "Gerente de Projeto", "Visitante"},
+			Roles:    []string{"Astronauta", "Engenheiro de Voo", "Comandante", "Biólogo", "Físico", "Médico", "Especialista em Comunicações", "Operador de Carga", "Técnico de Manutenção", "Cientista de Dados", "Psicólogo", "Meteorologista", "Engenheiro Robótico", "Químico", "Astrônomo", "Turista", "Nutricionista", "Piloto", "Gerente de Projeto", "Visitante"},
 			slug:     "estacao-espacial",
 		},
 		{
@@ -32,7 +32,7 @@ func getLocationAndRoles() []iLocationAndRoles {
 		},
 		{
 			Location: "Banco",
-			Roles:    []string{"Gerente", "Caixa", "Segurança", "Analista Financeiro", "Atendente", "Técnico de TI", "Economista", "Auditor", "Advogado", "Consultor de Investimentos", "Recepcionista", "Estagiário", "Analista de Crédito", "Operador de Câmbio", "Especialista em Riscos", "Administrador de Patrimônio", "Limpeza", "Gerente de Contas", "Corretor de Seguros", "Agente Comercial"},
+			Roles:    []string{"Gerente", "Caixa", "Segurança", "Analista Financeiro", "Atendente", "Técnico de TI", "Economista", "Ladrão", "Advogado", "Consultor de Investimentos", "Recepcionista", "Estagiário", "Analista de Crédito", "Operador de Câmbio", "Especialista em Riscos", "Administrador de Patrimônio", "Limpeza", "Gerente de Contas", "Corretor de Seguros", "Agente Comercial"},
 			slug:     "banco",
 		},
 		{
@@ -67,7 +67,7 @@ func getLocationAndRoles() []iLocationAndRoles {
 		},
 		{
 			Location: "Cassino",
-			Roles:    []string{"Croupier", "Segurança", "Gerente", "Bartender", "Caixa", "Dealer de Poker", "Cantor", "Limpeza", "Administrador Financeiro", "Atendente de Estacionamento", "Recepcionista", "Contador", "Supervisor de andar", "Garçom", "Vigilante", "Especialista em TI", "Técnico de Som e Luz", "Músico", "Gerente de Marketing", "Fotógrafo"},
+			Roles:    []string{"Croupier", "Segurança", "Gerente", "Bartender", "Caixa", "Dealer de Poker", "Apostador", "Limpeza", "Administrador Financeiro", "Atendente de Estacionamento", "Recepcionista", "Contador", "Client", "Garçom", "Vigilante", "Especialista em TI", "Apostador", "Músico", "Gerente de Marketing", "Fotógrafo"},
 			slug:     "cassino",
 		},
 		{
@@ -89,6 +89,52 @@ func getLocationAndRoles() []iLocationAndRoles {
 			Location: "Estúdio de TV",
 			Roles:    []string{"Apresentador", "Cinegrafista", "Figurinista", "Maquiador", "Engenheiro de Som", "Editor de Vídeo", "Iluminador", "Ator", "Roteirista", "Assistente de Produção", "Técnico de Informática", "Operador de Câmera", "Jornalista", "Diretor de TV", "Assistente de Direção", "Operador de Teleprompter", "Coordenador de Elenco", "Produtor", "Técnico de Transmissão", "Gerente de Programação"},
 			slug:     "estudio-tv",
+		},
+		// ---
+		{
+			Location: "Avião",
+			Roles:    []string{"Piloto", "Copiloto", "Comissário de Bordo", "Mecânico de Aviação", "Engenheiro Aeronáutico", "Terrorista", "Coordenador de Voo", "Agente de Bagagem", "Técnico de Segurança de Voo", "Instrutor de Voo", "Controlador de Tráfego Aéreo", "Atendente de Serviços ao Passageiro", "Chefe de Cabine", "Agente de Limpeza de Aeronaves", "Passageiro Primeira Classe", "Analista de Operações Aéreas", "Técnico em Aviônica", "Especialista em Navegação Aérea", "Passageiro Classe Economica", "Operador de Rampa"},
+			slug:     "aviao",
+		},
+		{
+			Location: "Praia",
+			Roles:    []string{"Salva-vidas", "Instrutor de Surf", "Vendedor Ambulante", "Gerente de Quiosque", "Monitor Ambiental", "Fotógrafo de Praia", "Instrutor de Mergulho", "Operador de Passeio de Barco", "Banhista", "Instrutor de Vôlei de Praia", "Operador de Aluguel de Equipamentos", "Artista de Areia", "Guarda Costeira", "Jogador de Altinha", "Surfista", "Massagista", "Ladrão", "Guia Turístico Local", "Promotor de Shows na Praia", "Encarregado de Limpeza de Praia"},
+			slug:     "praia",
+		},
+		{
+			Location: "Cinema",
+			Roles:    []string{"Bilheteiro", "Operador de Projeção", "Cliente", "Gerente de Cinema", "Técnico de Som", "Agente de Limpeza", "Segurança", "Programador de Filmes", "Assistente de Marketing", "Host de Estreias", "Designer Gráfico", "Analista de Atendimento ao Cliente", "Operador de Cabine", "Especialista em Tecnologia de Projeção", "Vendedor", "Operador de Máquina de Pipoca", "Coordenador de Eventos", "Assistente de Direção", "Operador de Máquina de Refrigerante", "Especialista em Efeitos Visuais"},
+			slug:     "cinema",
+		},
+		{
+			Location: "Base Militar",
+			Roles:    []string{"Comandante da Base", "Oficial de Operações", "Médico Militar", "Engenheiro Militar", "Sargento de Armas", "Especialista em Logística", "Controlador de Tráfego Aéreo Militar", "Técnico em Comunicações", "Instrutor de Combate", "Mecânico de Veículos Militares", "Operador de Radar", "Soldado", "Cozinheiro Militar", "Operador de Drones", "Especialista em Armamento", "Psicólogo Militar", "Sargento", "Recruta", "Coronel", "Sniper"},
+			slug:     "base-militar",
+		},
+		{
+			Location: "Spa",
+			Roles:    []string{"Massoterapeuta", "Esteticista", "Recepcionista", "Gerente de Spa", "Instrutor de Yoga", "Terapeuta Holístico", "Nutricionista", "Acupunturista", "Terapeuta de Reflexologia", "Especialista em Aromaterapia", "Coordenador de Atendimento ao Cliente", "Terapeuta de Reiki", "Instrutor de Pilates", "Gerente de Produtos de Spa", "Especialista em Terapias com Água", "Coordenador de Eventos de Bem-Estar", "Jardineiro", "Designer de Interiores de Spa", "Especialista em Banhos Terapêuticos", "Terapeuta Capilar"},
+			slug:     "spa",
+		},
+		{
+			Location: "Trem",
+			Roles:    []string{"Maquinista", "Condutor", "Fiscal de Trem", "Atendente de Bordo", "Técnico de Manutenção de Trilhos", "Operador de Estação", "Agente de Bilheteria", "Engenheiro Ferroviário", "Chefe de Serviço de Passageiros", "Operador de Sala de Controle", "Segurança Ferroviária", "Coordenador de Logística", "Agente de Limpeza", "Atendente de Bar no Trem", "Técnico em Sistemas de Sinalização", "Operador de Carga", "Assistente de Atendimento ao Cliente", "Gerente de Operações Ferroviárias", "Engenheiro de Sistemas de Trem", "Especialista em Segurança Ferroviária"},
+			slug:     "trem",
+		},
+		{
+			Location: "Delegacia",
+			Roles:    []string{"Delegado", "Investigador", "Agente de Polícia", "Escrivão", "Coordenador de Operações", "Técnico em Informática Forense", "Analista Criminal", "Operador de Câmeras de Segurança", "Perito Forense", "Administrador de Sistema Penitenciário", "Psicólogo Policial", "Especialista em Relações Comunitárias", "Instrutor de Armas de Fogo", "Operador de Comunicações", "Motorista Policial", "Assistente Administrativo", "Guarda de Cela", "Negociador de Reféns", "Agente de Trânsito", "Coordenador de Programas de Prevenção ao Crime"},
+			slug:     "delegacia",
+		},
+		{
+			Location: "Oficina",
+			Roles:    []string{"Mecânico de Automóveis", "Eletricista Automotivo", "Pintor de Carros", "Técnico de Ar Condicionado Automotivo", "Lanterneiro", "Gerente de Oficina", "Recepcionista de Oficina", "Estoquista de Peças", "Técnico de Diagnóstico de Veículos", "Vendedor de Peças Automotivas", "Lavador de Carros", "Técnico em Alinhamento e Balanceamento", "Especialista em Restauração de Veículos Antigos", "Técnico em Eletrônica Automotiva", "Coordenador de Serviços", "Assistente de Garantia", "Inspetor de Qualidade", "Operador de Máquinas Ferramenta", "Consultor Técnico Automotivo", "Especialista em Pneus"},
+			slug:     "oficina",
+		},
+		{
+			Location: "Estádio de Futebol",
+			Roles:    []string{"Gerente de Estádio", "Segurança de Estádio", "Coordenador de Eventos Esportivos", "Relações Públicas do Clube", "Técnico de Futebol", "Jogador de Futebol", "Fisioterapeuta Esportivo", "Narrador Esportivo", "Analista de Desempenho", "Médico Esportivo", "Operador de Câmera", "Diretor de Marketing Esportivo", "Vendedor de Ingressos", "Coordenador de Hospitalidade", "Administrador de Concessões Alimentícias", "Diretor de Operações de Jogo", "Engenheiro de Manutenção de Estádio", "Supervisor de Limpeza", "Organizador de Torcida", "Agente de Atendimento ao Cliente"},
+			slug:     "estadio-futebol",
 		},
 	}
 }
