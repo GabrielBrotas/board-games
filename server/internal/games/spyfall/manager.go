@@ -141,7 +141,7 @@ func (gm *GameManager) StartGame(dist SpiesDistribution) {
 			if i < len(data.Roles) {
 				player.SetRole(data.Roles[i])
 			} else {
-				player.SetRole(data.Roles[0])
+				player.SetRole(getRandomRole(data.Roles))
 			}
 		}
 
@@ -178,7 +178,7 @@ func (gm *GameManager) BroadcastSpiesNumber() {
 		}
 
 		err := player.Conn.WriteJSON(map[string]interface{}{
-			"type":       "spiesNumber",
+			"type":        "spiesNumber",
 			"spiesNumber": spiesNumber,
 		})
 		if err != nil {

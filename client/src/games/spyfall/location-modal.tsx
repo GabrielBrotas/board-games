@@ -4,67 +4,103 @@ import { MdClose } from "react-icons/md";
 export const availableLocations = [
   {
     location: "Hospital",
-    image: "/images/spyfall/hospital.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/hospital.jpg",
   },
   {
     location: "Estação Espacial",
-    image: "/images/spyfall/space-station.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/space-station.jpg",
   },
   {
     location: "Supermercado",
-    image: "/images/spyfall/supermarket.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/supermarket.jpg",
   },
   {
     location: "Submarino",
-    image: "/images/spyfall/submarine.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/submarine.jpg",
   },
   {
     location: "Banco",
-    image: "/images/spyfall/bank.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/bank.jpg",
   },
   {
     location: "Escola",
-    image: "/images/spyfall/school.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/school.jpg",
   },
   {
     location: "Circo",
-    image: "/images/spyfall/circus.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/circus.jpg",
   },
   {
     location: "Restaurante",
-    image: "/images/spyfall/restaurant.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/restaurant.jpg",
   },
   {
     location: "Teatro",
-    image: "/images/spyfall/theater.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/theater.jpg",
   },
   {
     location: "Aeroporto",
-    image: "/images/spyfall/airport.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/airport.jpg",
   },
   {
     location: "Zoológico",
-    image: "/images/spyfall/zoo.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/zoo.jpg",
   },
   {
     location: "Cassino",
-    image: "/images/spyfall/casino.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/casino.jpg",
   },
   {
     location: "Navio Cruzeiro",
-    image: "/images/spyfall/cruise-ship.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/cruise-ship.jpg",
   },
   {
     location: "Parque de Diversões",
-    image: "/images/spyfall/amusement-park.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/amusement-park.jpg",
   },
   {
     location: "Museu",
-    image: "/images/spyfall/museum.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/museum.jpg",
   },
   {
     location: "Estúdio de TV",
-    image: "/images/spyfall/tv-studio.jpg",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/tv-studio.jpg",
+  },
+  {
+    location: "Avião",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/airplane.jpg",
+  },
+  {
+    location: "Praia",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/beach.jpg",
+  },
+  {
+    location: "Cinema",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/movie-theater.jpg",
+  },
+  {
+    location: "Base Militar",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/military-base.jpg",
+  },
+  {
+    location: "Spa",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/spa.jpg",
+  },
+  {
+    location: "Trem",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/train.jpg",
+  },
+  {
+    location: "Delegacia",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/police-station.jpg",
+  },
+  {
+    location: "Oficina",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/car-workshop.jpg",
+  },
+  {
+    location: "Estádio de Futebol",
+    image: "https://raw.githubusercontent.com/GabrielBrotas/board-games/main/images/spyfall/football-stadium.jpg",
   },
 ];
 
