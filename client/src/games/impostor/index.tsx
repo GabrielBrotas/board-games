@@ -40,18 +40,34 @@ export function WhoIsTheImposter() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const newWs = new WebSocket(
-      `${process.env.NEXT_PUBLIC_WS_API_URL}/games/impostor/ws`
-    );
-    setWs(newWs);
+    const initializeWebSocket = () => {
+      const newWs = new WebSocket(
+        `${process.env.NEXT_PUBLIC_WS_API_URL}/games/impostor/ws`
+      );
+      setWs(newWs);
 
-    newWs.onopen = () => handleWebSocketOpen(newWs);
-    newWs.onmessage = handleWebSocketMessage;
-    newWs.onclose = () => console.log("Connection closed");
+      newWs.onopen = () => handleWebSocketOpen(newWs);
+      newWs.onmessage = handleWebSocketMessage;
+      newWs.onclose = () => console.log("Connection closed");
+
+      return newWs;
+    };
+
+    const newWs = initializeWebSocket();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && (!ws || ws.readyState !== WebSocket.OPEN)) {
+        console.log("Reconnecting WebSocket...");
+        setWs(initializeWebSocket());
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       console.log("Closing connection...");
       newWs.close();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [user]);
 
