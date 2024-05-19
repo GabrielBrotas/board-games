@@ -41,6 +41,23 @@ export function Spyfall() {
   // WebSocket connection
   const [ws, setWs] = useState<WebSocket | null>(null);
 
+  const getGameStatus = async () => {
+    if (!isLoading && user) {
+      try {
+        const gameStatus = await api.getSpyfallGameStatus(user.id)
+
+        setGameStarted(gameStatus.gameStarted);
+        setIsPlaying(gameStatus.inGame);
+        setRole(gameStatus.role);
+        setLocation(gameStatus.location);
+        setLoadingGameStatus(false);
+      } catch (error) {
+        console.error("Error getting game status: ", error);
+        setLoadingGameStatus(false);
+      }
+    }
+  }
+
   useEffect(() => {
     const initializeWebSocket = () => {
       const newWs = new WebSocket(
@@ -61,6 +78,7 @@ export function Spyfall() {
       if (document.visibilityState === "visible" && (!ws || ws.readyState !== WebSocket.OPEN)) {
         console.log("Reconnecting WebSocket...");
         setWs(initializeWebSocket());
+        getGameStatus()
       }
     };
 
@@ -75,19 +93,7 @@ export function Spyfall() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      api
-        .getSpyfallGameStatus(user.id)
-        .then((data) => {
-          setGameStarted(data.gameStarted);
-          setIsPlaying(data.inGame);
-          setRole(data.role);
-          setLocation(data.location);
-          setLoadingGameStatus(false);
-        })
-        .catch((error) => {
-          console.error("Error getting game status: ", error);
-          setLoadingGameStatus(false);
-        });
+      getGameStatus()
     }
   }, [user, isLoading]);
 

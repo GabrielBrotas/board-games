@@ -39,6 +39,21 @@ export function WhoIsTheImposter() {
   // WebSocket connection
   const [ws, setWs] = useState<WebSocket | null>(null);
 
+  const getGameStatus = async () => {
+    if (!isLoading && user) {
+      try {
+        const gameStatus = await api.getImposterGameStatus(user.id)
+        setGameStarted(gameStatus.gameStarted);
+        setMessage(gameStatus.word);
+        setIsPlaying(gameStatus.inGame);
+        setLoadingGameStatus(false);
+      } catch (error) {
+        console.error("Error getting game status: ", error);
+        setLoadingGameStatus(false);
+      }
+    }
+  }
+
   useEffect(() => {
     const initializeWebSocket = () => {
       const newWs = new WebSocket(
@@ -59,6 +74,7 @@ export function WhoIsTheImposter() {
       if (document.visibilityState === "visible" && (!ws || ws.readyState !== WebSocket.OPEN)) {
         console.log("Reconnecting WebSocket...");
         setWs(initializeWebSocket());
+        getGameStatus();
       }
     };
 
@@ -73,18 +89,7 @@ export function WhoIsTheImposter() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      api
-        .getImposterGameStatus(user.id)
-        .then((data) => {
-          setGameStarted(data.gameStarted);
-          setMessage(data.word);
-          setIsPlaying(data.inGame);
-          setLoadingGameStatus(false);
-        })
-        .catch((error) => {
-          console.error("Error getting game status: ", error);
-          setLoadingGameStatus(false);
-        });
+      getGameStatus()
     }
   }, [user, isLoading]);
 
